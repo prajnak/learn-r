@@ -1,0 +1,1142 @@
+
+R version 3.2.2 (2015-08-14) -- "Fire Safety"
+Copyright (C) 2015 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin15.0.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Loading required package: stats
+
+Attaching package: ‘stats’
+
+The following objects are masked from ‘package:dplyr’:
+
+    filter, lag
+
+> options(STERM='iESS', str.dendrogram.last="'", editor='emacsclient', show.error.locations=TRUE)
+> 
+> + Sourced file '/Users/pulsar/github/learn-r/stats_tut.R'
+> library(swirl)
+
+| Hi! I see that you have some variables saved in your workspace. To keep
+| things running smoothly, I recommend you clean up before starting swirl.
+
+| Type ls() to see a list of the variables in your workspace. Then, type
+| rm(list=ls()) to clear your workspace.
+
+| Type swirl() when you are ready to begin.
+
+> install <- course <- zip("~/Downloads/swirl_courses-master.zip", multi=TRUE, which <- course="R Programming")
+Error: unexpected '=' in "install <- course <- zip("~/Downloads/swirl_courses-master.zip", multi=TRUE, which <- course="
+> install_course_zip("~/Downloads/swirl_courses-master.zip", multi=TRUE, which_course="R Programming")
+
+| Course installed successfully!
+
+> install_course_zip("~/Downloads/swirl_courses-master.zip", multi=TRUE)
+
+| Course installed successfully!
+
+Warning message:
+In if (file.copy(dirs_to_copy, file.path(system.file(package = "swirl"),  :
+  the condition has length > 1 and only the first element will be used
+> ?swirl
+> help
+function (topic, package = NULL, lib.loc = NULL, verbose = getOption("verbose"), 
+    try.all.packages = getOption("help.try.all.packages"), help_type = getOption("help_type")) 
+{
+    types <- c("text", "html", "pdf")
+    if (!missing(package)) 
+        if (is.name(y <- substitute(package))) 
+            package <- as.character(y)
+    if (missing(topic)) {
+        if (!is.null(package)) {
+            help_type <- if (!length(help_type)) 
+                "text"
+            else match.arg(tolower(help_type), types)
+            if (interactive() && help_type == "html") {
+                port <- tools::startDynamicHelp(NA)
+                if (port <= 0L) 
+                  return(library(help = package, lib.loc = lib.loc, 
+                    character.only = TRUE))
+                browser <- if (.Platform$GUI == "AQUA") {
+                  get("aqua.browser", envir = as.environment("tools:RGUI"))
+                }
+                else getOption("browser")
+                browseURL(paste0("http://127.0.0.1:", port, "/library/", 
+                  package, "/html/00Index.html"), browser)
+                return(invisible())
+            }
+            else return(library(help = package, lib.loc = lib.loc, 
+                character.only = TRUE))
+        }
+        if (!is.null(lib.loc)) 
+            return(library(lib.loc = lib.loc))
+        topic <- "help"
+        package <- "utils"
+        lib.loc <- .Library
+    }
+    ischar <- tryCatch(is.character(topic) && length(topic) == 
+        1L, error = identity)
+    if (inherits(ischar, "error")) 
+        ischar <- FALSE
+    if (!ischar) {
+        reserved <- c("TRUE", "FALSE", "NULL", "Inf", "NaN", 
+            "NA", "NA_integer_", "NA_real_", "NA_complex_", "NA_character_")
+        stopic <- deparse(substitute(topic))
+        if (!is.name(substitute(topic)) && !stopic %in% reserved) 
+            stop("'topic' should be a name, length-one character vector or reserved word")
+        topic <- stopic
+    }
+    help_type <- if (!length(help_type)) 
+        "text"
+    else match.arg(tolower(help_type), types)
+    paths <- index.search(topic, find.package(if (is.null(package)) 
+        loadedNamespaces()
+    else package, lib.loc, verbose = verbose))
+    tried_all_packages <- FALSE
+    if (!length(paths) && is.logical(try.all.packages) && !is.na(try.all.packages) && 
+        try.all.packages && is.null(package) && is.null(lib.loc)) {
+        for (lib in .libPaths()) {
+            packages <- .packages(TRUE, lib)
+            packages <- packages[is.na(match(packages, .packages()))]
+            paths <- c(paths, index.search(topic, file.path(lib, 
+                packages)))
+        }
+        paths <- paths[nzchar(paths)]
+        tried_all_packages <- TRUE
+    }
+    paths <- unique(paths)
+    attributes(paths) <- list(call = match.call(), topic = topic, 
+        tried_all_packages = tried_all_packages, type = help_type)
+    class(paths) <- "help_files_with_topic"
+    paths
+}
+<bytecode: 0x7fa96f52a278>
+<environment: namespace:utils>
+> help.start
+function (update = FALSE, gui = "irrelevant", browser = getOption("browser"), 
+    remote = NULL) 
+{
+    WINDOWS <- .Platform$OS.type == "windows"
+    if (!WINDOWS) {
+        if (!is.function(browser) && (length(browser) != 1L || 
+            !is.character(browser) || !nzchar(browser))) 
+            stop("invalid browser name, check options(\"browser\").")
+    }
+    home <- if (is.null(remote)) {
+        port <- tools::startDynamicHelp(NA)
+        if (port > 0L) {
+            if (update) 
+                make.packages.html(temp = TRUE)
+            paste0("http://127.0.0.1:", port)
+        }
+        else stop("help.start() requires the HTTP server to be running", 
+            call. = FALSE)
+    }
+    else remote
+    url <- paste0(home, "/doc/html/index.html")
+    if (WINDOWS) {
+        cat(gettextf("If nothing happens, you should open\n%s yourself\n", 
+            sQuote(url)))
+    }
+    else if (is.character(browser)) {
+        writeLines(strwrap(gettextf("If the browser launched by '%s' is already running, it is *not* restarted, and you must switch to its window.", 
+            browser), exdent = 4L))
+        writeLines(gettext("Otherwise, be patient ..."))
+    }
+    browseURL(url, browser = browser)
+    invisible()
+}
+<bytecode: 0x7fa96f7deaa0>
+<environment: namespace:utils>
+> help.start
+function (update = FALSE, gui = "irrelevant", browser = getOption("browser"), 
+    remote = NULL) 
+{
+    WINDOWS <- .Platform$OS.type == "windows"
+    if (!WINDOWS) {
+        if (!is.function(browser) && (length(browser) != 1L || 
+            !is.character(browser) || !nzchar(browser))) 
+            stop("invalid browser name, check options(\"browser\").")
+    }
+    home <- if (is.null(remote)) {
+        port <- tools::startDynamicHelp(NA)
+        if (port > 0L) {
+            if (update) 
+                make.packages.html(temp = TRUE)
+            paste0("http://127.0.0.1:", port)
+        }
+        else stop("help.start() requires the HTTP server to be running", 
+            call. = FALSE)
+    }
+    else remote
+    url <- paste0(home, "/doc/html/index.html")
+    if (WINDOWS) {
+        cat(gettextf("If nothing happens, you should open\n%s yourself\n", 
+            sQuote(url)))
+    }
+    else if (is.character(browser)) {
+        writeLines(strwrap(gettextf("If the browser launched by '%s' is already running, it is *not* restarted, and you must switch to its window.", 
+            browser), exdent = 4L))
+        writeLines(gettext("Otherwise, be patient ..."))
+    }
+    browseURL(url, browser = browser)
+    invisible()
+}
+<bytecode: 0x7fa96f7deaa0>
+<environment: namespace:utils>
+> help.start()
+starting httpd help server ... done
+If the browser launched by '/usr/bin/open' is already running, it is
+    *not* restarted, and you must switch to its window.
+Otherwise, be patient ...
+> swirl()
+
+| Welcome to swirl!
+
+| Please sign in. If you've been here before, use the same name as you did
+| then. If you are new, call yourself something unique.
+
+What shall I call you? praj
+
+| Please choose a course, or type 0 to exit swirl.
+
+ 1: Data Analysis
+ 2: ErrFind
+ 3: Exploratory Data Analysis
+ 4: Getting and Cleaning Data
+ 5: Mathematical Biostatistics Boot Camp
+ 6: Open Intro
+ 7: R Programming
+ 8: R Programming Alt
+ 9: Regression Models
+10: Statistical Inference
+11: Writing swirl Courses
+12: Take me to the swirl course repository!
+
+Selection: 3
+
+| Please choose a lesson, or type 0 to return to course menu.
+
+ 1: Principles of Analytic Graphs   2: Exploratory Graphs           
+ 3: Graphics Devices in R           4: Plotting Systems             
+ 5: Base Plotting System            6: Lattice Plotting System      
+ 7: Working with Colors             8: GGPlot2 Part1                
+ 9: GGPlot2 Part2                  10: GGPlot2 Extras               
+11: Hierarchical Clustering        12: K Means Clustering           
+13: Dimension Reduction            14: Clustering Example           
+15: CaseStudy                      
+
+Selection: 1
+
+| Attemping to load lesson dependencies...
+
+| Package ‘ggplot2’ loaded correctly!
+
+| Package ‘jpeg’ loaded correctly!
+
+  |                                                                      |   0%
+
+| Principles_of_Analytic_Graphs. (Slides for this and other Data Science
+| courses may be found at github
+| https://github.com/DataScienceSpecialization/courses/. If you care to use
+| them, they must be downloaded as a zip file and viewed locally. This lesson
+| corresponds to 04_ExploratoryAnalysis/Principles_of_Analytic_Graphics.)
+
+...
+
+  |==                                                                    |   3%
+| In this lesson, we'll discuss some basic principles of presenting data
+| effectively. These will illustrate some fundamental concepts of displaying
+| results in order to make them more meaningful and convincing. These
+| principles are cribbed from Edward Tufte's great 2006 book, Beautiful
+| Evidence. You can read more about them at the www.edwardtufte.com website.
+
+...
+
+  |====                                                                  |   6%
+| As a warm-up, which of the following would NOT be a good use of analytic
+| graphing?
+
+1: To decide which horse to bet on at the track
+2: To show comparisons
+3: To show multivariate data
+4: To show causality, mechanism, explanation
+
+Selection: 1
+
+| All that practice is paying off!
+
+  |======                                                                |   9%
+| You're ready to start. Graphs give us a visual form of data, and the first
+| principle of analytic graphs is to show some comparison. You'll hear more
+| about this when you study statistical inference (another great course BTW),
+| but evidence for a hypothesis is always relative to another competing or
+| alternative hypothesis.
+
+...
+
+  |========                                                              |  11%
+| When presented with a claim that something is good, you should always ask
+| "Compared to What?" This is why in commercials you often hear the phrase
+| "other leading brands". An implicit comparison, right?
+
+...
+
+  |==========                                                            |  14%
+| Consider this boxplot which shows the relationship between the use of an air
+| cleaner and the number of symptom-free days of asthmatic children. (The top
+| and bottom lines of the box indicate the 25% and 75% quartiles of the data,
+| and the horizontal line in the box shows the 50%.) Since the box is above 0,
+| the number of symptom-free days for children with asthma is bigger using the
+| air cleaner. This is good, right?
+
+...
+
+  |============                                                          |  17%
+| How many days of improvement does the median correspond to?
+
+1: 1
+2: -2
+3: 12
+4: 4
+
+Selection: 1
+
+| You are doing so well!
+
+  |==============                                                        |  20%
+| While it's somewhat informative, it's also somewhat cryptic, since the y-axis
+| is claiming to show a change in number of symptom-free days. Wouldn't it be
+| better to show a comparison?
+
+...n
+
+  |================                                                      |  23%
+| Like this? Here's a graphic which shows two boxplots, the one on the left
+| showing the results for a control group that doesn't use an air cleaner
+| alongside the previously shown boxplot.
+
+...
+
+  |==================                                                    |  26%
+| By showing the two boxplots side by side, you can clearly see that using the
+| air cleaner increases the number of symptom-free days for most asthmatic
+| children. The plot on the right (using the air cleaner) is generally higher
+| than the one on the left (the control group).
+
+...
+
+  |====================                                                  |  29%
+| What does this graph NOT show you?
+
+1: Half the chidren in the control group had no improvement
+2: 75% of the children using the air cleaner had at most 3 symptom-free days
+3: Using the air cleaner makes asthmatic children sicker
+4: Children in the control group had at most 3 symptom-free days
+
+Selection: 1
+
+| Almost! Try again.
+
+| Since the boxplot on the right shows that the number of symptom-free days
+| increases with air cleaner use, the graph does NOT show that use makes the
+| children sicker.
+
+1: Using the air cleaner makes asthmatic children sicker
+2: 75% of the children using the air cleaner had at most 3 symptom-free days
+3: Children in the control group had at most 3 symptom-free days
+4: Half the chidren in the control group had no improvement
+
+Selection: 1
+
+| Your dedication is inspiring!
+
+  |======================                                                |  31%
+| So the first principle was to show a comparison. The second principle is to
+| show causality or a mechanism of how your theory of the data works. This
+| explanation or systematic structure shows your causal framework for thinking
+| about the question you're trying to answer.
+
+... 
+
+  |========================                                              |  34%
+| Consider this plot which shows the dual boxplot we just showed, but next to
+| it we have a corresponding plot of changes in measures of particulate matter.
+
+...
+
+  |==========================                                            |  37%
+| This picture tries to explain how the air cleaner increases the number of
+| symptom-free days for asthmatic children. What mechanism does the graph
+| imply?
+
+1: That the air cleaner increases pollution
+2: That the air in the control group is cleaner than the air in the other group
+3: That the air cleaner reduces pollution
+4: That the children in the control group are healthier
+
+Selection: 3
+
+| You nailed it! Good job!
+
+  |============================                                          |  40%
+| By showing the two sets of boxplots side by side you're explaining your
+| theory of why the air cleaner increases the number of symptom-free days.
+| Onward!
+
+...
+
+  |==============================                                        |  43%
+| So the first principle was to show some comparison, the second was to show a
+| mechanism, so what will the third principle say to show?
+
+...
+
+  |================================                                      |  46%
+| Multivariate data!
+
+...
+
+  |==================================                                    |  49%
+| What is multivariate data you might ask? In technical (scientific) literature
+| this term means more than 2 variables. Two-variable plots are what you saw in
+| high school algebra.  Remember those x,y plots when you were learning about
+| slopes and intercepts and equations of lines? They're valuable, but usually
+| questions are more complicated and require more variables.
+
+...
+
+  |====================================                                  |  51%
+| Sometimes, if you restrict yourself to two variables you'll be misled and
+| draw an incorrect conclusion.
+
+...
+
+  |======================================                                |  54%
+| Consider this plot which shows the relationship between air pollution
+| (x-axis) and mortality rates among the elderly (y-axis). The blue regression
+| line shows a surprising result. (You'll learn about regression lines when you
+| take the fabulous Regression Models course.)
+
+...
+
+  |========================================                              |  57%
+| What does the blue regression line indicate?
+
+1: As pollution increases fewer people die
+2: As pollution increases more people die
+3: As pollution increases the number of deaths doesn't change
+4: Pollution doesn't really increase, it just gets reported more
+
+Selection: 1
+
+| You are really on a roll!
+
+  |==========================================                            |  60%
+| Fewer deaths with more pollution? That's a surprise! Something's gotta be
+| wrong, right? In fact, this is an example of Simpson's paradox, or the
+| Yule–Simpson effect. Wikipedia
+| (http://en.wikipedia.org/wiki/Simpson%27s_paradox) tells us that this "is a
+| paradox in probability and statistics, in which a trend that appears in
+| different groups of data disappears when these groups are combined."
+
+...
+
+  |============================================                          |  63%
+| Suppose we divided this mortality/pollution data into the four seasons. Would
+| we see different trends?
+
+...
+
+  |==============================================                        |  66%
+| Yes, we do! Plotting the same data for the 4 seasons individually we see a
+| different result.
+
+...
+
+  |================================================                      |  69%
+| What does the new plot indicate?
+
+1: Pollution doesn't really increase, it just gets reported more
+2: As pollution increases the seasons change
+3: As pollution increases more people die in all seasons
+4: As pollution increases fewer people die in all seasons
+
+Selection: 4
+
+| You're close...I can feel it! Try it again.
+
+| In all the seasons, as you move to the right along the x-axis pollution
+| increases and all four blue regression lines move upward, indicating more
+| deaths.
+
+1: As pollution increases fewer people die in all seasons
+2: As pollution increases more people die in all seasons
+3: As pollution increases the seasons change
+4: Pollution doesn't really increase, it just gets reported more
+
+Selection: 1
+
+| Not quite! Try again.
+
+| In all the seasons, as you move to the right along the x-axis pollution
+| increases and all four blue regression lines move upward, indicating more
+| deaths.
+
+1: As pollution increases more people die in all seasons
+2: As pollution increases the seasons change
+3: Pollution doesn't really increase, it just gets reported more
+4: As pollution increases fewer people die in all seasons
+
+Selection: 2
+
+| Try again. Getting it right on the first try is boring anyway!
+
+| In all the seasons, as you move to the right along the x-axis pollution
+| increases and all four blue regression lines move upward, indicating more
+| deaths.
+
+1: As pollution increases the seasons change
+2: As pollution increases fewer people die in all seasons
+3: Pollution doesn't really increase, it just gets reported more
+4: As pollution increases more people die in all seasons
+
+Selection: 4
+
+| You are quite good my friend!
+
+  |==================================================                    |  71%
+| The fourth principle of analytic graphing involves integrating evidence. This
+| means not limiting yourself to one form of expression. You can use words,
+| numbers, images as well as diagrams. Graphics should make use of many modes
+| of data presentation. Remember, "Don't let the tool drive the analysis!"
+
+...
+
+  |====================================================                  |  74%
+| To show you what we mean, here's an example of a figure taken from a paper
+| published in the Journal of the AMA. It shows the relationship between
+| pollution and hospitalization of people with heart disease. As you can see,
+| it's a lot different from our previous plots. The solid circles in the center
+| portion indicate point estimates of percentage changes in hospitalization
+| rates for different levels of pollution. The lines through the circles
+| indicate confidence intervals associated with these estimates. (You'll learn
+| more about confidence intervals in another great course, the one on
+| statistical inference.)
+
+...
+
+  |======================================================                |  77%
+| Note that on the right side of the figure is another column of numbers, one
+| for each of the point estimates given. This column shows posterior
+| probabilities that relative risk is greater than 0. This, in effect, is a
+| measure of the strength of the evidence showing the correlation between
+| pollution and hospitalization.  The point here is that all of this
+| information is located in one picture so that the reader can see the strength
+| of not only the correlations but the evidence as well.
+
+...
+
+  |========================================================              |  80%
+| The fifth principle of graphing involves describing and documenting the
+| evidence with sources and appropriate labels and scales. Credibility is
+| important so the data graphics should tell a complete story. Also, using R,
+| you want to preserve any code you use to generate your data and graphics so
+| that the research can be replicated if necessary. This allows for easy
+| verification or finding bugs in your analysis.
+
+...
+
+  |==========================================================            |  83%
+| The sixth and final principle of analytic graphing is maybe the most
+| important. Content is king! If you don't have something interesting to
+| report, your graphs won't save you. Analytical presentations ultimately stand
+| or fall depending on the quality, relevance, and integrity of their content.
+
+...
+
+  |============================================================          |  86%
+| Review time!!!
+
+...
+
+  |==============================================================        |  89%
+| Which of the following is NOT a good principle of graphing?
+
+1: To describe and document evidence
+2: To integrate multiple modes of evidence
+3: Content is king
+4: Having unreadable labels
+
+Selection: 4
+
+| Excellent work!
+
+  |================================================================      |  91%
+| Which of the following is NOT a good principle of graphing?
+
+1: To demonstrate a causative mechanism underlying a correlation
+2: To prove you're always right
+3: To show two competing hypotheses
+4: Content is king
+
+Selection: 2
+
+| You got it!
+
+  |==================================================================    |  94%
+| Which of the following is NOT a good principle of graphing?
+
+1: To show that some fonts are better than others
+2: To show good labels and scales
+3: To integrate different types of evidence
+4: Content is king
+
+Selection: 1
+
+| Great job!
+
+  |====================================================================  |  97%
+| True or False? Color is king.
+
+1: True
+2: False
+
+Selection: 1
+
+| That's not exactly what I'm looking for. Try again.
+
+| Think of the sixth principle
+
+1: False
+2: True
+
+Selection: 1
+
+| You are doing so well!
+
+  |======================================================================| 100%
+| Congrats! You've concluded exploring this lesson on principles of graphing.
+| We hope you found it principally principled.
+
+...
+
+| Are you currently enrolled in the Coursera course associated with this
+| lesson?
+
+1: Yes
+2: No
+
+Selection: 2
+
+| You've reached the end of this lesson! Returning to the main menu...
+
+| Please choose a course, or type 0 to exit swirl.
+
+ 1: Data Analysis
+ 2: ErrFind
+ 3: Exploratory Data Analysis
+ 4: Getting and Cleaning Data
+ 5: Mathematical Biostatistics Boot Camp
+ 6: Open Intro
+ 7: R Programming
+ 8: R Programming Alt
+ 9: Regression Models
+10: Statistical Inference
+11: Writing swirl Courses
+12: Take me to the swirl course repository!
+
+Selection: 3
+
+| Please choose a lesson, or type 0 to return to course menu.
+
+ 1: Principles of Analytic Graphs   2: Exploratory Graphs           
+ 3: Graphics Devices in R           4: Plotting Systems             
+ 5: Base Plotting System            6: Lattice Plotting System      
+ 7: Working with Colors             8: GGPlot2 Part1                
+ 9: GGPlot2 Part2                  10: GGPlot2 Extras               
+11: Hierarchical Clustering        12: K Means Clustering           
+13: Dimension Reduction            14: Clustering Example           
+15: CaseStudy                      
+
+Selection: 2
+  |                                                                      |   0%
+
+| Exploratory_Graphs. (Slides for this and other Data Science courses may be
+| found at github https://github.com/DataScienceSpecialization/courses/. If you
+| care to use them, they must be downloaded as a zip file and viewed locally.
+| This lesson corresponds to 04_ExploratoryAnalysis/exploratoryGraphs.)
+
+...
+
+  |=                                                                     |   1%
+| In this lesson, we'll discuss why graphics are an important tool for data
+| scientists and the special role that exploratory graphs play in the field.
+
+...
+
+  |==                                                                    |   3%
+| Which of the following would NOT be a good reason to use graphics in data
+| science?
+
+1: To find a color that best matches the shirt you're wearing
+2: To find patterns in data
+3: To understand data properties
+4: To suggest modeling strategies
+
+Selection: 1
+
+| You nailed it! Good job!
+
+  |===                                                                   |   4%
+| So graphics give us some visual form of data, and since our brains are very
+| good at seeing patterns, graphs give us a compact way to present data and
+| find or display any pattern that may be present.
+
+...
+
+  |====                                                                  |   5%
+| Which of the following cliches captures the essence of graphics?
+
+1: A picture is worth a 1000 words
+2: A rose by any other name smells as sweet
+3: To err is human, to forgive divine
+4: The apple doesn't fall far from the tree
+
+Selection: 1
+
+| Keep working like that and you'll get there!
+
+  |=====                                                                 |   7%
+| Exploratory graphs serve mostly the same functions as graphs. They help us
+| find patterns in data and understand its properties. They suggest modeling
+| strategies and help to debug analyses. We DON'T use exploratory graphs to
+| communicate results.
+
+...
+
+  |======                                                                |   8%
+| Instead, exploratory graphs are the initial step in an investigation, the
+| "quick and dirty" tool used to point the data scientist in a fruitful
+| direction. A scientist might need to make a lot of exploratory graphs in
+| order to develop a personal understanding of the problem being studied. Plot
+| details such as axes, legends, color and size are cleaned up later to convey
+| more information in an aesthetically pleasing way.
+
+...
+
+  |=======                                                               |   9%
+| To demonstrate these ideas, we've copied some data for you from the U.S.
+| Environmental Protection Agency (EPA) which sets national ambient air quality
+| standards for outdoor air pollution. These Standards say that for fine
+| particle pollution (PM2.5), the "annual mean, averaged over 3 years" cannot
+| exceed 12 micro grams per cubic meter. We stored the data from the U.S. EPA
+| web site in the data frame pollution. Use the R function head to see the
+| first few entries of pollution.
+
+> head(pollution)
+       pm25  fips region longitude latitude
+1  9.771185 01003   east -87.74826 30.59278
+2  9.993817 01027   east -85.84286 33.26581
+3 10.688618 01033   east -87.72596 34.73148
+4 11.337424 01049   east -85.79892 34.45913
+5 12.119764 01055   east -86.03212 34.01860
+6 10.827805 01069   east -85.35039 31.18973
+
+| Great job!
+
+  |========                                                              |  11%
+| We see right away that there's at least one county exceeding the EPA's
+| standard of 12 micrograms per cubic meter. What else do we see?
+
+...
+
+  |=========                                                             |  12%
+| We see 5 columns of data. The pollution count is in the first column labeled
+| pm25. We'll work mostly with that. The other 4 columns are a fips code
+| indicating the state (first 2 digits) and county (last 3 digits) with that
+| count, the associated region (east or west), and the longitude and latitude
+| of the area. Now run the R command dim with pollution as an argument to see
+| how long the table is.
+
+> dim(pollution)
+[1] 576   5
+
+| Excellent work!
+
+  |=========                                                             |  14%
+| So there are 576 entries in pollution. We'd like to investigate the question
+| "Are there any counties in the U.S. that exceed that national standard (12
+| micro grams per cubic meter) for fine particle pollution?" We'll look at
+| several one dimensional summaries of the data to investigate this question.
+
+...
+
+  |==========                                                            |  15%
+| The first technique uses the R command summary, a 5-number summary which
+| returns 6 numbers. Run it now with the pm25 column of pollution as its
+| argument. Recall that the construct for this is pollution$pm25.
+
+> pollution$ %>% summ
+Error: unexpected SPECIAL in "pollution$ %>%"
+> pollution$ %>% summary
+Error: unexpected SPECIAL in "pollution$ %>%"
+> pollution$pm25 %>% summary
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  3.383   8.549  10.050   9.836  11.360  18.440 
+
+| Not quite, but you're learning! Try again. Or, type info() for more options.
+
+| Type summary(pollution$pm25) at the command prompt.
+
+> summary(pollution)
+      pm25            fips            region      longitude      
+ Min.   : 3.383   Length:576         east:442   Min.   :-158.04  
+ 1st Qu.: 8.549   Class :character   west:134   1st Qu.: -97.38  
+ Median :10.047   Mode  :character              Median : -87.37  
+ Mean   : 9.836                                 Mean   : -91.65  
+ 3rd Qu.:11.356                                 3rd Qu.: -80.72  
+ Max.   :18.441                                 Max.   : -68.26  
+    latitude    
+ Min.   :19.68  
+ 1st Qu.:35.30  
+ Median :39.09  
+ Mean   :38.56  
+ 3rd Qu.:41.75  
+ Max.   :64.82  
+
+| Almost! Try again. Or, type info() for more options.
+
+| Type summary(pollution$pm25) at the command prompt.
+
+>  summary(pollution$pm25)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  3.383   8.549  10.050   9.836  11.360  18.440 
+
+| Keep up the great work!
+
+  |===========                                                           |  16%
+| This shows us basic info about the pm25 data, namely its Minimum (0
+| percentile) and Maximum (100 percentile) values, and three Quartiles of the
+| data. These last indicate the pollution measures at which 25%, 50%, and 75%
+| of the counties fall below. In addition to these 5 numbers we see the Mean or
+| average measure of particulate pollution across the 576 counties.
+
+...
+
+  |============                                                          |  18%
+| Half the measured counties have a pollution level less than or equal to what
+| number of micrograms per cubic meter?
+
+1: 9.836
+2: 8.549
+3: 10.050
+4: 11.360
+
+Selection: 3
+
+| You got it right!
+
+  |=============                                                         |  19%
+| To save you a lot of typing we've saved off pollution$pm25 for you in the
+| variable ppm. You can use ppm now in place of the longer expression. Try it
+| now as the argument of the R command quantile. See how the results look a lot
+| like the results of the output of the summary command.
+
+> quantile(ppm)
+       0%       25%       50%       75%      100% 
+ 3.382626  8.548799 10.046697 11.356012 18.440731 
+
+| You are really on a roll!
+
+  |==============                                                        |  20%
+| See how the results are similar to those returned by summary? Quantile gives
+| the quartiles, right? What is the one value missing from this quantile output
+| that summary gave you?
+
+1: the maximum value
+2: the minimum value
+3: the median
+4: the mean
+
+Selection: 4
+
+| You got it right!
+
+  |===============                                                       |  22%
+| Now we'll plot a picture, specifically a boxplot. Run the R command boxplot
+| with ppm as an input. Also specify the color parameter col equal to "blue".
+
+> boxplot(ppm, col="blue")
+
+| You are amazing!
+
+  |================                                                      |  23%
+| The boxplot shows us the same quartile data that summary and quantile did.
+| The lower and upper edges of the blue box respectively show the values of the
+| 25% and 75% quantiles.
+
+...
+
+  |=================                                                     |  24%
+| What do you think the horizontal line inside the box represents?
+
+1: the minimum value
+2: the median
+3: the maximum value
+4: the mean
+
+Selection: 2
+
+| You nailed it! Good job!
+
+  |==================                                                    |  26%
+| The "whiskers" of the box (the vertical lines extending above and below the
+| box) relate to the range parameter of boxplot, which we let default to the
+| value 1.5 used by R. The height of the box is the interquartile range, the
+| difference between the 75th and 25th quantiles. In this case that difference
+| is 2.8. The whiskers are drawn to be a length of range*2.8 or 1.5*2.8. This
+| shows us roughly how many, if any, data points are outliers, that is, beyond
+| this range of values.
+
+...
+
+  |===================                                                   |  27%
+| Note that boxplot is part of R's base plotting package. A nice feature that
+| this package provides is its ability to overlay features. That is, you can
+| add to (annotate) an existing plot.
+
+...
+
+  |====================                                                  |  28%
+| To see this, run the R command abline with the argument h equal to 12. Recall
+| that 12 is the EPA standard for air quality.
+
+> abline(h=12)
+
+| You nailed it! Good job!
+
+  |=====================                                                 |  30%
+| What do you think this command did?
+
+1: drew a horizontal line at 12
+2: nothing
+3: drew a vertical line at 12
+4: hid 12 random data points
+
+Selection: 1
+
+| You are quite good my friend!
+
+  |======================                                                |  31%
+| So abline "adds one or more straight lines through the current plot." We see
+| from the plot that the bulk of the measured counties comply with the standard
+| since they fall under the line marking that standard.
+
+...
+
+  |=======================                                               |  32%
+| Now use the R command hist (another function from the base package) with the
+| argument ppm. Specify the color parameter col equal to "green". This will
+| plot a histogram of the data.
+
+> hist(ppm, col="green")
+
+| Perseverance, that's the answer.
+
+  |========================                                              |  34%
+| The histogram gives us a little more detailed information about our data,
+| specifically the distribution of the pollution counts, or how many counties
+| fall into each bucket of measurements.
+
+... 
+
+  |=========================                                             |  35%
+| What are the most frequent pollution counts?
+
+1: between 6 and 8
+2: between 9 and 12
+3: under 5
+4: between 12 and 14
+
+Selection: 2
+
+| You nailed it! Good job!
+
+  |==========================                                            |  36%
+| Now run the R command rug with the argument ppm.
+
+> rug(ppm)
+
+| You are doing so well!
+
+  |==========================                                            |  38%
+| This one-dimensional plot, with its grayscale representation, gives you a
+| little more detailed information about how many data points are in each
+| bucket and where they lie within the bucket. It shows (through density of
+| tick marks) that the greatest concentration of counties has between 9 and 12
+| micrograms per cubic meter just as the histogram did.
+
+...hist(ppm, col="green")
+
+  |===========================                                           |  39%
+| To illustrate this a little more, we've defined for you two vectors, high and
+| low, containing pollution data of high (greater than 15) and low (less than
+| 5) values respectively. Look at low now and see how it relates to the output
+| of rug.
+
+> rug(ppm)
+
+| Not quite, but you're learning! Try again. Or, type info() for more options.
+
+| Type low at the command prompt.
+
+> ## Exploratory Data Analysis
+> ## doing a course in swirl, learn r in r
+> ppm <- pollution$pm25
+
+| Not exactly. Give it another go. Or, type info() for more options.
+
+| Type low at the command prompt.
+
+> hist(ppm,col="green")
+
+| One more time. You can do it! Or, type info() for more options.
+
+| Type low at the command prompt.
+
+> rug(ppm)
+
+| You're close...I can feel it! Try it again. Or, type info() for more options.
+
+| Type low at the command prompt.
+
+> low
+ [1] 3.494351 4.186090 4.917140 4.504539 4.793644 4.601408 4.195688 4.625279
+ [9] 4.460193 4.978397 4.324736 4.175901 3.382626 4.132739 4.955570 4.565808
+
+| Great job!
+
+  |============================                                          |  41%
+| It confirms that there are two data points between 3 and 4 and many between 4
+| and 5. Now look at high.
+
+> high
+[1] 16.19452 15.80378 18.44073 16.66180 15.01573 17.42905 16.25190 16.18358
+
+| You got it!
+
+  |=============================                                         |  42%
+| Again, we see one data point greater than 18, one between 17 and 18, several
+| between 16 and 17 and two between 15 and 16, verifying what rug indicated.
+
+...
+
+  |==============================                                        |  43%
+| Now rerun hist with 3 arguments, ppm as its first, col equal to "green", and
+| the argument breaks equal to 100.
+
+> hist(ppm, col="green", breaks = 100)
+
+| You are quite good my friend!
+
+  |===============================                                       |  45%
+| What do you think the breaks argument specifies in this case?
+
+1: the number of buckets to split the data into
+2: the number of stars in the sky
+3: the number of data points to graph
+4: the number of counties exceeding the EPA standard
+
+Selection: 1
+
+| Perseverance, that's the answer.
+
+  |================================                                      |  46%
+| So this histogram with more buckets is not nearly as smooth as the preceding
+| one. In fact, it's a little too noisy to see the distribution clearly. When
+| you're plotting histograms you might have to experiment with the argument
+| breaks to get a good idea of your data's distribution. For fun now, rerun the
+| R command rug with the argument ppm.
+
+> rug(ppm)
+
+| Keep working like that and you'll get there!
+
+  |=================================                                     |  47%
+| See how rug works with the existing plot? It automatically adjusted its
+| pocket size to that of the last plot plotted.
+
+...
+
+  |==================================                                    |  49%
+| Now rerun hist with ppm as the data and col equal to "green".
+
+> hist(ppm, col='green')
+
+| That's correct!
+
+  |===================================                                   |  50%
+| Now run the command abline with the argument v equal to 12 and the argument
+| lwd equal to 2.
+
+> abline(v=12, lwd=2)
+
+| Keep working like that and you'll get there!
+
+  |====================================                                  |  51%
+| See the vertical line at 12? Not very visible, is it, even though you
+| specified a line width of 2? Run abline with the argument v equal to
+| median(ppm), the argument col equal to "magenta", and the argument lwd equal
+| to 4.
+
+> abline(v=median(ppm), lwd=4, col="magenta")
+
+| That's a job well done!
+
+  |=====================================                                 |  53%
+| Better, right? Thicker and more of a contrast in color. This shows that
+| although the median (50%) is below the standard, there are a fair number of
+| counties in the U.S that have pollution levels higher than the standard.
+
+...
+
+  |======================================                                |  54%
+| Now recall that our pollution data had 5 columns of information. So far we've
+| only looked at the pm25 column. We can also look at other information. To
+| remind yourself what's there run the R command names with pollution as the
+| argument.
+
+> names(pollution)
+[1] "pm25"      "fips"      "region"    "longitude" "latitude" 
+
+| Excellent work!
+
+  |=======================================                               |  55%
+| Longitude and latitude don't sound interesting, and each fips is unique since
+| it identifies states (first 2 digits) and counties (last 3 digits). Let's
+| look at the region column to see what's there. Run the R command table on
+| this column. Use the construct pollution$region. Store the result in the
+| variable reg.
+
+> 
