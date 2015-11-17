@@ -118,11 +118,106 @@ plot(airquality$Temp, airquality$Ozone, main="Ozone and Temperature")
 ## now add a title for the 1x3 plot. Have to use mtext() cmmands
 mtext("Ozone and Weather in New York City", outer = TRUE)
 
+#### Lattice PLotting system
+## the 'lattice' package is an implementation of the Trellis graphics system for R. It focuses on multivariate data. Its implemented using two packages. first -> lattice -- contains code for producing trellis graphics and includes functions such as xyplot, bowplot(box and whiskers) and levelplot.
 
+## the second package is 'grid' -> contains low-level functions used by the 'lattice' package. end users rarely need to call functions in the grid package. All plotting in lattice is done in a single function call unlike 'base' plotting which uses multiple calls
+## xyplot --> scatterplot, bwplot -> box and whiskers or boxplot, histograms for histograms. others not covered in this lesson include stripplot, dotplot, splom, levelplot
 
+## Lattice functions take a formula for their first argument of the form y ~ x -> indicates that y depends on x, so in a scatterplot, y goes on y-axis and x goes on x-axis. Example call: xyplot(y ~x | f * g, data). f, g are conditioning ariables that help lattice plot multivariate data
+head(airquality)
+xyplot(Ozone~Wind, data=airquality)
+## lattice shares some graphical params such as pch, col with the base package.
+xyplot(Ozone~Wind, data=airquality, col="red", pch=8, main="Big Apple Data")
 
+## Generating multi panel plots using lattice
+xyplot(Ozone~Wind | as.factor(Month), data=airquality, layout=c(5,1))
+xyplot(Ozone~Wind | Month, data=airquality, layout=c(5,1)) # using as.factor tells lattice to use the value of the Month field to label each subplot
 
+# Calls to the lattice package don't plot data directly to the graphics device. they return an object of class trellis. The lattice print methods do the actual plotting to device portion. they return plot objects that can be stored(better tos ave code and dta rather than plot objects). On cmd line trellis objects are auto-printed so it appears the call to a lattice function is plotting the data
+p <- xyplot(Ozone~Wind, data=airquality)
+print(p)
+names(p) #prints the named properties of the trellis object like 'formula', 'legend', etc. theres about 45 of them. a lot of them maybe NULL in value
+mynames[myfull] #show non-NULL properties of p, about 29 values.
+p[["formula"]]
+p[["x.limits"]]
 
+## lattice has panel functions that control what happens inside each panel of a plot.panel funs receive x,y coords of data points in their panel along with optional arguments.
+table(f)
+xyplot(y~x|f, layout=c(2,1))
+head(v1)
 
+str(diamonds)
+table(diamonds$color)
+table(diamonds$color, diamonds$cut)
+xyplot(price~carat|color*cut, data=diamonds, pch=20, xlab=myxlab, ylab=myylab,
+       main=mymain)
 
+#### Working with colors
+library(jpeg)
+library(RColorBrewer)
+library(datasets)
+## this lesson supplements the lessons on plotting with base and lattice. anything that atkes the argument 'col'
+## two color palettes available in grDevices package. heat.colors(red->yellow->white) and topo.colors(blue -> brown)
 
+##colors() shows available colors
+sample(colors(), 10)
+
+##two more functions in grDevices --> colorRamp and colorRampPalette give more options
+##they take color names as arguments and use them as "palettes", that is, these argument colors are blended in different proportions to form new colors
+
+## colorRamp -> takes a palette of colors and returns a functions that takes values between 0 and 1 as arguments. 0, 1 are extremes, values in between are blends of extremes
+pal <- colorRamp(c("red", "blue"))
+pal(0.5) # returns a 1by3 array of 8 bits ea
+pal(seq(0,1,len=6))
+
+p1 <- colorRampPalette(c("red", "blue")) # colorramppalette returns a vector of hex values.argument passed in is number of colors to return
+p1(2)
+p1(6)
+0xcc()
+p2  <- colorRampPalette(c("red", "yellow"))
+p2(2)
+p2(10)
+showMe(p1(20))
+showMe(p2(20))
+showMe(p2(2))
+?rgb
+p3 <- colorRampPalette(c('red', 'blue'), alpha=0.5)
+p3(5)
+
+plot(x,y,pch=19, col=rgb(0,.5,.5, .3))
+
+## RColorBrewer package --> 3 types of color palettes -> sequential, divergent and qualitative. 
+
+cols <- brewer.pal(3, "BuGn")
+showMe(cols)
+pal <- colorRampPalette(cols)
+showMe(pal(20))
+
+## use colors generated from pal(20) to display topographic information in Auckland's Maunga Whau volcano.
+image(volcano, col=pal(20))
+image(volcano, col=p1(20))
+
+#### GGPlot2 Part 1
+## combines the best of lattice and base plotting systems. allows multipanel plots, and post facto annotation calls for adding texts, labels, titles etc. Uses the low-level 'grid' package to draw graphics. ggplot2 plots are composed of aesthetics (attribs such as size, shape and color) and geoms(geometric objects) such as points, lines and bars
+
+## 2 major plotting functions: qplot -> quick plot works like base package plot. looks for data in a data frame or parent environment. the other one is ggplot2 which offers more flexibility and customization
+str(mpg)
+qplot(displ, hwy, data=mpg)
+qplot(displ, hwy, data=mpg, color=drv) ## color by wheel drive type. front wheel drive has higest mileage and rear wheel lowest as they also tend to have heavier engine displacements 
+qplot(displ, hwy, data=mpg, color=drv, geom=c("point", "smooth")) ## add 95% confidence interval gray areas surrounding each trend line
+qplot(y=hwy, data=mpg, color=drv)
+myhigh
+
+##box whisker plots
+qplot(drv, hwy, data=mpg, geom="boxplot") #boxplot of mileage value (hwy) for each kind of wheel drive
+qplot(drv, hwy, data=mpg, geom="boxplot", color=manufacturer) #boxplots of hwy with a boxplot for each manufacturer
+
+##histograms
+qplot(hwy, data=mpg, fill=drv)
+## use facets/panels instead of colors to distinguish between drive factors. the facets argument is shorthand for number of rows(to the left of the ~) and num of columns(to the right of the ~). The . indicates a single row and drv implies 3 since there are 3 distinct drive factors
+qplot(displ, hwy, data=mpg, facets=. ~ drv)
+
+qplot(hwy, data=mpg, facets= drv ~ ., binwidth=2) #num rows = drv, num cols = 1 for the facet grid
+
+#### GGPlot2 part2

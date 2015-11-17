@@ -26,3 +26,4 @@ chrtstr %>% typeof
 paste(chrtstr, collapse="")
 
 install.packages('swirl')
+install.packages('knitr')
