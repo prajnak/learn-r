@@ -220,4 +220,90 @@ qplot(displ, hwy, data=mpg, facets=. ~ drv)
 
 qplot(hwy, data=mpg, facets= drv ~ ., binwidth=2) #num rows = drv, num cols = 1 for the facet grid
 
-#### GGPlot2 part2
+#### GGPlot2 part2 - using ggplot instead of qplot
+## Basic Components of a ggplot plot:
+# DATA FRAME
+# AESTHETIC MAPPINGS
+# GEOMS
+# FACETS
+# STATS -> statistical transformations applied by ggplot2 to the data. quantiles, smoothing, binning
+# SCALES
+# COORDINATE SYSTEM
+qplot(displ, hwy, data=mpg, geom=c("point", "smooth"), facets=.~drv, method="loess")
+g <- ggplot(mpg, aes(displ, hwy))
+summary(g)
+g+geom_point() # add a layer to plot
+g+geom_point()+geom_smooth() # grey shadow around the blue line is the confidence band.
+g+geom_point()+geom_smooth(method="lm")
+g+geom_point()+geom_smooth(method="lm")+facet_grid(.~drv)
+g+geom_point()+geom_smooth(method="lm")+facet_grid(.~drv)+ggtitle("Swirl Rules!")
+
+## Each geom function can be modified with their options. theme() can be used to modify aspects of entire plot. theme_gray() is default theme, theme_bw() is plainer color scheme
+g+geom_point(color="pink", size=4, alpha=1/2)
+g+geom_point(size=4, alpha=1/2, aes(color=drv))
+
+g+geom_point(aes(color=drv))+ labs(title="Swirl Rules!") + labs(x="Displacement", y="Hwy Mileage")
+
+g+geom_point(aes(color=drv), size=2, alpha=1/2)+geom_smooth(size=4, linetype=3, method="lm", se=FALSE) # se=FALSE turns off confidence intervals or std error bands
+
+g+geom_point(aes(color=drv))+theme_bw(base_family = "Times")
+
+plot(myx, myy, type="l", ylim=c(-3,3)) #line plot of some test data with preset y range shown
+##do the same thing with ggplot
+g <- ggplot(testdat, aes(x=myx, y=myy))
+g+geom_line()
+g+geom_line()+ylim(-3,3) # creates a break in line plot at the excluded outlier.
+
+## add a call to coord_cartesian with ylim=c(-3,3) to prevent broken lines
+g+geom_line()+coord_cartesian(ylim = c(-3,3)) # this call just zooms in on the graph between y=-3 to 3
+
+g <- ggplot(mpg, aes(x=displ, y=hwy, color=factor(year)))
+g+geom_point()
+g+geom_point()+facet_grid(drv~cyl, margins = TRUE)
+g+geom_point()+facet_grid(drv~cyl, margins = TRUE)+geom_smooth(method="lm", se=FALSE, size=2, color="black")
+g+geom_point()+facet_grid(drv~cyl, margins = TRUE)+geom_smooth(method="lm", se=FALSE, size=2, color="black")+labs(x="Displacement", y="Highway Mileage", title="Swirl Rules!")
+
+#### GGplot extras
+qplot(price, data=diamonds)
+range(diamonds$price)
+qplot(price, data=diamonds, binwidth=18497/30)
+qplot(price, data=diamonds, binwidth=18497/30, fill=cut)
+
+## plot histogram asa density function
+qplot(price, data = diamonds, geom="density")
+qplot(price, data = diamonds, geom="density", color=cut)
+
+##scatterplots
+qplot(carat, price, data=diamonds)
+qplot(carat, price, data=diamonds, shape=cut)
+qplot(carat, price, data=diamonds, color=cut)
+
+qplot(carat, price, data=diamonds, color=cut,geom=c("point", "smooth"), method="lm")
+qplot(carat, price, data=diamonds, color=cut,geom=c("point", "smooth"), method="lm", facets=.~cut)
+
+## back to ggplot
+g <- ggplot(diamonds, aes(depth, price))
+g+geom_point(alpha=1/3) # create scatterplot of relationship b/n depth and price
+cutpoints <- quantile(diamonds$carat, seq(0,1,length=4), na.rm = TRUE)
+diamonds$car2 <- cut(diamonds$carat, cutpoints)
+g+geom_point(alpha=1/3)+facet_grid(cut ~ car2)
+g+geom_point(alpha=1/3)+facet_grid(cut ~ car2)+geom_smooth(method="lm", size=3, color="pink")
+
+ggplot(diamonds, aes(carat, price))+geom_boxplot()+facet_grid(.~cut)
+
+#### Hierarchical Clustering -- useful in early stages of analysis. helps find patterns or relationships betweendifferent factos or variables. Creates a hierarchy of clusters. Clustering organizes data points that are close into groups. How do we define closeness? how to group? how to interpret grouping?
+## Hierarchical clustering is an agglomerative or bottom up approach. Each observation starts in its own cluster, and pairs of clusters are merged as one moves up the hierarchy. We'll find the closest two points and put them together in one cluster, then find the next closest pair in the updated picture, and so forth. Repeat this process until we reach a reasonable stopping place. One can stop clustering eeither when the clusters are too far apart to be merged (distance criterion) or when there is a sufficiently small number of clusters (number criterion)
+
+## How do we define closeness? Distance/similarity are the metrics usually used to denote closeness. Euclidean distance and correlation similarity are continuous measures of closeness while Manhattan distance is a binary measure. Its important to use a measure of distance that fits the data / problem being investigated
+
+## Manhatan distance or city block distance -> sum of absolute values of distances between each coordinate so the distance between points (x1, y1) and (x2, y2) is |x1-x2|+|y1=y2|. can be generalized for more than 2 dimensions like euclidean distance
+
+## lets use the random data in the dataFrame object and create a dendrogram. A dendogram is an abstract picture or graph which shows how the 12 points in the dataFrame dataset cluster together. Clusters that are close are connected with a line. we;kk use Euclidean distance as a metric for closeness
+
+dist(dataFrame) #calculate euclidean dist. returns a lower triangular matrix. distxy
+hc <- hclust(distxy)
+plot(hc)
+plot(as.dendrogram(hc))
+abline(h=1.5, col='blue')
+abline(h=.4, col='red')
+abline(h=.05, col='green')
